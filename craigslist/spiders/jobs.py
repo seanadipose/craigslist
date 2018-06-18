@@ -1,19 +1,3 @@
-# -*- coding: utf-8 -*-
-# import scrapy
-
-
-# class JobsSpider(scrapy.Spider):
-#     name = 'jobs'
-#     allowed_domains = ['https://seattle.craigslist.org/d/creative-services/search/crs']
-#     # start_urls = ['https://seattle.craigslist.org/d/creative-services/search/crs/']
-#     start_urls = ['https://seattle.craigslist.org/d/creative-services/search/crs']
-
-
-#     def parse(self, response):
-#         titles = response.xpath('//a[@class="result-title hdrlnk"]/text()').extract()
-#         print(titles)
-
-# -*- coding: utf-8 -*-
 import scrapy
  
 class JobsSpider(scrapy.Spider):
@@ -22,7 +6,11 @@ class JobsSpider(scrapy.Spider):
     start_urls = ['https://seattle.craigslist.org/d/creative-services/search/crs']
  
     def parse(self, response):
-        titles = response.xpath('//a[@class="result-title hdrlnk"]/text()').extract()
-        print(titles)
-        for title in titles:
-          yield {'Title' : title}
+        jobs = response.xpath('//p[@class="result-info"]')
+        for job in jobs:
+          title = job.xpath('a/text()').extract_first()
+          address = job.xpath('span[@class="result-meta"]/span[@class="result-hood"]/text()').extract_first("")[2:-1]
+          relative_url = job.xpath('a/@href').extract_first()
+          absolute_url = "https://seattle.craigslist.org" + relative_url
+          yield{'URL':absolute_url, Title: 'title', 'Address': address}
+          
